@@ -41,7 +41,9 @@ let g:loaded_multisplit_vim = 1
 
 
 " Size to reserve for the highlighted window
-let g:winSplitSize=100
+if !exists("g:winSplitSize")
+    let g:winSplitSize=100
+endif
 
 "Navigate left and right
 map <C-W><C-l> :MoveSplit l<CR>
