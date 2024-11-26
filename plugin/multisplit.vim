@@ -34,18 +34,18 @@
 " IN THE SOFTWARE.
 "
 
-if exists("g:loaded_multisplit_vim")
+if exists('g:loaded_multisplit_vim')
     finish
 endif
 let g:loaded_multisplit_vim = 1
 
 
 " Size to reserve for the highlighted window
-if !exists("g:winSplitSize")
-    let g:winSplitSize=100
+if !exists('g:winSplitSize')
+    let g:winSplitSize = 100
 endif
 
-"Navigate left and right
+" Navigate left and right
 map <C-W><C-l> :MoveSplit l<CR>
 map <C-W><C-h> :MoveSplit h<CR>
 
@@ -59,49 +59,49 @@ map <C-W><C-m> :DeleteRightmost<CR>
 
 map <C-W><C-n> :CreateSplit<CR>
 
-" CREATE A SPLIT
-command! CreateSplit call CreateSplit()
-command! -nargs=1 MoveSplit call MoveSplit(<f-args>)
-command! DeleteLeftmost call DeleteLeftmost()
-command! DeleteRightmost call DeleteRightmost()
-command! ExpandCurrentWindow call ExpandCurrentWindow()
+" Commands
+command! -bar CreateSplit call s:create_split()
+command! -bar -nargs=1 MoveSplit call s:move_split(<f-args>)
+command! -bar DeleteLeftmost call s:delete_leftmost()
+command! -bar DeleteRightmost call s:delete_rightmost()
+command! -bar ExpandCurrentWindow call s:expand_current_window()
 
 
-function! CreateSplit()
+function! s:create_split()
   vsplit
-  call MoveSplit('l')
+  call s:move_split('l')
 endfunction
 
-function! MoveSplit(direction)
+function! s:move_split(direction)
   exec ('wincmd ' . a:direction)
-  call ExpandCurrentWindow()
+  call s:expand_current_window()
 endfunction
 
-function! ExpandCurrentWindow()
+function! s:expand_current_window()
 	exec('vertical resize '.g:winSplitSize)
-	call BalanceOtherWindows()
+	call s:balance_other_windows()
 endfunction
 
-function! BalanceOtherWindows()
-  let &winfixwidth=1
-  wincmd =
-  let &winfixwidth=0
+function! s:balance_other_windows()
+  let &winfixwidth = 1
+  horizontal wincmd =
+  let &winfixwidth = 0
 endfunction
 
-function! DeleteLeftmost()
-  let w=FindFarthest('h')
-  call CloseWindow(w)
-  call BalanceOtherWindows()
+function! s:delete_leftmost()
+  let w = s:find_farthest('h')
+  call s:close_window(w)
+  call s:balance_other_windows()
 endfunction
 
-function! DeleteRightmost()
-   let w=FindFarthest('l')
-  call CloseWindow(w)
-  call BalanceOtherWindows()
+function! s:delete_rightmost()
+  let w = s:find_farthest('l')
+  call s:close_window(w)
+  call s:balance_other_windows()
 endfunction
 
-function! CloseWindow(w)
-  let l:currentWin=winnr()
+function! s:close_window(w)
+  let l:currentWin = winnr()
   exec a:w . ' wincmd w'
   if l:currentWin > a:w
 	  let l:currentWin = l:currentWin - 1
@@ -110,7 +110,7 @@ function! CloseWindow(w)
   exec l:currentWin . ' wincmd w'
 endfunction
 
-function! FindFarthest(direction)
+function! s:find_farthest(direction)
   let l:startWin = winnr()
   let l:previousWin = -1
   while winnr() != l:previousWin
